@@ -16,7 +16,6 @@ import org.sonar.api.rule.Severity;
 import org.sonar.api.rules.RuleType;
 import org.sonar.ce.task.projectanalysis.component.Component;
 import org.sonar.ce.task.projectanalysis.component.ReportAttributes;
-import org.sonar.core.issue.DefaultIssue;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -102,18 +101,16 @@ public class BitbucketPullRequestDecoratorTest {
         when(component.getType()).thenReturn(Component.Type.FILE);
         when(component.getReportAttributes()).thenReturn(reportAttributes);
 
-        DefaultIssue defaultIssue = mock(DefaultIssue.class);
-        when(defaultIssue.status()).thenReturn(Issue.STATUS_OPEN);
-        when(defaultIssue.severity()).thenReturn(Severity.CRITICAL);
-        when(defaultIssue.getLine()).thenReturn(ISSUE_LINE);
-        when(defaultIssue.key()).thenReturn(ISSUE_KEY);
-        when(defaultIssue.type()).thenReturn(RuleType.BUG);
-        when(defaultIssue.getMessage()).thenReturn(ISSUE_MESSAGE);
         when(analysisDetails.getIssueUrl(ISSUE_KEY)).thenReturn(ISSUE_LINK);
         when(analysisDetails.getBaseImageUrl()).thenReturn(IMAGE_URL);
 
         PostAnalysisIssueVisitor.ComponentIssue componentIssue = mock(PostAnalysisIssueVisitor.ComponentIssue.class);
-        when(componentIssue.getIssue()).thenReturn(defaultIssue);
+        when(componentIssue.getStatus()).thenReturn(Issue.STATUS_OPEN);
+        when(componentIssue.getSeverity()).thenReturn(Severity.CRITICAL);
+        when(componentIssue.getLine()).thenReturn(ISSUE_LINE);
+        when(componentIssue.getKey()).thenReturn(ISSUE_KEY);
+        when(componentIssue.getType()).thenReturn(RuleType.BUG);
+        when(componentIssue.getMessage()).thenReturn(ISSUE_MESSAGE);
         when(componentIssue.getComponent()).thenReturn(component);
 
         PostAnalysisIssueVisitor postAnalysisIssueVisitor = mock(PostAnalysisIssueVisitor.class);

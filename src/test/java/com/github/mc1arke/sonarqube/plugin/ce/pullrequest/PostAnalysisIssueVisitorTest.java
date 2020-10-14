@@ -46,8 +46,7 @@ public class PostAnalysisIssueVisitorTest {
 
         assertThat(testCase.getIssues().size()).isEqualTo(expected.size());
         for (int i = 0; i < expected.size(); i++) {
-            assertThat(testCase.getIssues().get(i).getIssue()).isEqualTo(expected.get(i).getIssue());
-            assertThat(testCase.getIssues().get(i).getComponent()).isEqualTo(expected.get(i).getComponent());
+            assertThat(testCase.getIssues().get(i)).isEqualTo(expected.get(i));
         }
     }
 }

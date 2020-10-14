@@ -214,7 +214,8 @@ public class AnalysisDetailsTest {
         doReturn(Stream.of(issue1, issue2, issue3, issue4, issue5, issue6).map(i -> {
             PostAnalysisIssueVisitor.ComponentIssue componentIssue =
                     mock(PostAnalysisIssueVisitor.ComponentIssue.class);
-            doReturn(i).when(componentIssue).getIssue();
+            doReturn(i.status()).when(componentIssue).getStatus();
+            doReturn(i.type()).when(componentIssue).getType();
             return componentIssue;
         }).collect(Collectors.toList())).when(postAnalysisIssueVisitor).getIssues();
 
@@ -461,13 +462,11 @@ public class AnalysisDetailsTest {
         AnalysisDetails.MeasuresHolder measuresHolder = mock(AnalysisDetails.MeasuresHolder.class);
         doReturn(treeRootHolder).when(measuresHolder).getTreeRootHolder();
 
-        DefaultIssue issue = mock(DefaultIssue.class);
-        doReturn(Issue.STATUS_OPEN).when(issue).status();
-        doReturn(RuleType.BUG).when(issue).type();
         PostAnalysisIssueVisitor postAnalysisIssueVisitor = mock(PostAnalysisIssueVisitor.class);
 
         PostAnalysisIssueVisitor.ComponentIssue componentIssue = mock(PostAnalysisIssueVisitor.ComponentIssue.class);
-        doReturn(issue).when(componentIssue).getIssue();
+        doReturn(Issue.STATUS_OPEN).when(componentIssue).getStatus();
+        doReturn(RuleType.BUG).when(componentIssue).getType();
         doReturn(Collections.singletonList(componentIssue)).when(postAnalysisIssueVisitor).getIssues();
 
         QualityGate.Condition duplicationsCondition = mock(QualityGate.Condition.class);

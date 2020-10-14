@@ -45,7 +45,6 @@ import org.sonar.ce.task.projectanalysis.component.TreeRootHolder;
 import org.sonar.ce.task.projectanalysis.measure.Measure;
 import org.sonar.ce.task.projectanalysis.measure.MeasureRepository;
 import org.sonar.ce.task.projectanalysis.metric.MetricRepository;
-import org.sonar.core.issue.DefaultIssue;
 import org.sonar.server.measure.Rating;
 
 import java.io.UnsupportedEncodingException;
@@ -194,24 +193,22 @@ public class AnalysisDetails {
         return formatterFactory.documentFormatter().format(document, formatterFactory);
     }
 
-    public String createAnalysisIssueSummary(PostAnalysisIssueVisitor.ComponentIssue componentIssue, FormatterFactory formatterFactory) {
-        final DefaultIssue issue = componentIssue.getIssue();
-
+    public String createAnalysisIssueSummary(PostAnalysisIssueVisitor.ComponentIssue issue, FormatterFactory formatterFactory) {
         String baseImageUrl = getBaseImageUrl();
 
-        Long effort = issue.effortInMinutes();
+        Long effort = issue.getEffortInMinutes();
         Node effortNode = (null == effort ? new Text("") : new Paragraph(new Text(String.format("**Duration (min):** %s", effort))));
 
-        String resolution = issue.resolution();
+        String resolution = issue.getResolution();
         Node resolutionNode = (StringUtils.isBlank(resolution) ? new Text("") : new Paragraph(new Text(String.format("**Resolution:** %s ", resolution))));
 
         Document document = new Document(
-                new Paragraph(new Text(String.format("**Type:** %s ", issue.type().name())), new Image(issue.type().name(), String.format("%s/checks/IssueType/%s.svg?sanitize=true", baseImageUrl, issue.type().name().toLowerCase()))),
-                new Paragraph(new Text(String.format("**Severity:** %s ", issue.severity())), new Image(issue.severity(), String.format("%s/checks/Severity/%s.svg?sanitize=true", baseImageUrl, issue.severity().toLowerCase()))),
+                new Paragraph(new Text(String.format("**Type:** %s ", issue.getType().name())), new Image(issue.getType().name(), String.format("%s/checks/IssueType/%s.svg?sanitize=true", baseImageUrl, issue.getType().name().toLowerCase()))),
+                new Paragraph(new Text(String.format("**Severity:** %s ", issue.getSeverity())), new Image(issue.getSeverity(), String.format("%s/checks/Severity/%s.svg?sanitize=true", baseImageUrl, issue.getSeverity().toLowerCase()))),
                 new Paragraph(new Text(String.format("**Message:** %s", issue.getMessage()))),
                 effortNode,
                 resolutionNode,
-                new Link(getIssueUrl(issue.key()), new Text("View in SonarQube"))
+                new Link(getIssueUrl(issue.getKey()), new Text("View in SonarQube"))
         );
         return formatterFactory.documentFormatter().format(document, formatterFactory);
     }
@@ -307,10 +304,9 @@ public class AnalysisDetails {
         return Arrays.stream(RuleType.values()).collect(Collectors.toMap(k -> k,
                                                                          k -> postAnalysisIssueVisitor.getIssues()
                                                                                  .stream()
-                                                                                 .map(PostAnalysisIssueVisitor.ComponentIssue::getIssue)
                                                                                  .filter(i -> !CLOSED_ISSUE_STATUS
-                                                                                         .contains(i.status()))
-                                                                                 .filter(i -> k == i.type()).count()));
+                                                                                         .contains(i.getStatus()))
+                                                                                 .filter(i -> k == i.getType()).count()));
     }
 
     private static String pluralOf(long value, String singleLabel, String multiLabel) {

@@ -149,7 +149,7 @@ public class GitlabServerPullRequestDecorator implements PullRequestBuildStatusD
                 }
             }
 
-            List<PostAnalysisIssueVisitor.ComponentIssue> openIssues = analysis.getPostAnalysisIssueVisitor().getIssues().stream().filter(i -> OPEN_ISSUE_STATUSES.contains(i.getIssue().getStatus())).collect(Collectors.toList());
+            List<PostAnalysisIssueVisitor.ComponentIssue> openIssues = analysis.getPostAnalysisIssueVisitor().getIssues().stream().filter(i -> OPEN_ISSUE_STATUSES.contains(i.getStatus())).collect(Collectors.toList());
 
             String summaryComment = analysis.createAnalysisSummary(new MarkdownFormatterFactory());
             List<NameValuePair> summaryContentParams = Collections
@@ -163,13 +163,13 @@ public class GitlabServerPullRequestDecorator implements PullRequestBuildStatusD
 
             for (PostAnalysisIssueVisitor.ComponentIssue issue : openIssues) {
                 String path = analysis.getSCMPathForIssue(issue).orElse(null);
-                if (path != null && issue.getIssue().getLine() != null) {
+                if (path != null && issue.getLine() != null) {
                     //only if we have a path and line number
                     String fileComment = analysis.createAnalysisIssueSummary(issue, new MarkdownFormatterFactory());
 
                     if (scmInfoRepository.getScmInfo(issue.getComponent())
-                            .filter(i -> i.hasChangesetForLine(issue.getIssue().getLine()))
-                            .map(i -> i.getChangesetForLine(issue.getIssue().getLine()))
+                            .filter(i -> i.hasChangesetForLine(issue.getLine()))
+                            .map(i -> i.getChangesetForLine(issue.getLine()))
                             .map(Changeset::getRevision)
                             .filter(commits::contains)
                             .isPresent()) {
@@ -182,12 +182,12 @@ public class GitlabServerPullRequestDecorator implements PullRequestBuildStatusD
                                 new BasicNameValuePair("position[head_sha]", mergeRequest.getDiffRefs().getHeadSha()),
                                 new BasicNameValuePair("position[old_path]", path),
                                 new BasicNameValuePair("position[new_path]", path),
-                                new BasicNameValuePair("position[new_line]", String.valueOf(issue.getIssue().getLine())),
+                                new BasicNameValuePair("position[new_line]", String.valueOf(issue.getLine())),
                                 new BasicNameValuePair("position[position_type]", "text"));
 
                         postCommitComment(mergeRequestDiscussionURL, headers, fileContentParams, fileCommentEnabled);
                     } else {
-                        LOGGER.info(String.format("Skipping %s:%d since the commit does not belong to the MR", path, issue.getIssue().getLine()));
+                        LOGGER.info(String.format("Skipping %s:%d since the commit does not belong to the MR", path, issue.getLine()));
                     }
                 }
             }

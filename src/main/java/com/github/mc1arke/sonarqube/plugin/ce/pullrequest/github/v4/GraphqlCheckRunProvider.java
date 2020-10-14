@@ -236,17 +236,17 @@ public class GraphqlCheckRunProvider implements CheckRunProvider {
                 .limit(50)
                 .filter(i -> i.getComponent().getReportAttributes().getScmPath().isPresent())
                 .filter(i -> i.getComponent().getType() == Component.Type.FILE)
-                .filter(i -> i.getIssue().resolution() == null)
-                .filter(i -> OPEN_ISSUE_STATUSES.contains(i.getIssue().status())).map(componentIssue -> {
+                .filter(i -> i.getResolution() == null)
+                .filter(i -> OPEN_ISSUE_STATUSES.contains(i.getStatus())).map(componentIssue -> {
             InputObject<Object> issueLocation = graphqlProvider.createInputObject()
-                    .put("startLine", Optional.ofNullable(componentIssue.getIssue().getLine()).orElse(0))
-                    .put("endLine", Optional.ofNullable(componentIssue.getIssue().getLine()).orElse(0))
+                    .put("startLine", Optional.ofNullable(componentIssue.getLine()).orElse(0))
+                    .put("endLine", Optional.ofNullable(componentIssue.getLine()).orElse(0))
                     .build();
             return graphqlProvider.createInputObject()
                     .put("path", componentIssue.getComponent().getReportAttributes().getScmPath().get())
                     .put("location", issueLocation)
-                    .put("annotationLevel", mapToGithubAnnotationLevel(componentIssue.getIssue().severity()))
-                    .put("message", componentIssue.getIssue().getMessage().replaceAll("\\\\","\\\\\\\\").replaceAll("\"", "\\\\\"")).build();
+                    .put("annotationLevel", mapToGithubAnnotationLevel(componentIssue.getSeverity()))
+                    .put("message", componentIssue.getMessage().replaceAll("\\\\","\\\\\\\\").replaceAll("\"", "\\\\\"")).build();
         }).collect(Collectors.toList());
     }
 

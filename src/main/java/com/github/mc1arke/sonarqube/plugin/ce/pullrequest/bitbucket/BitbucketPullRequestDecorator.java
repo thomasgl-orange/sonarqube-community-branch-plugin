@@ -142,17 +142,17 @@ public class BitbucketPullRequestDecorator implements PullRequestBuildStatusDeco
         Map<Object, Set<CodeInsightsAnnotation>> annotationChunks = analysisDetails.getPostAnalysisIssueVisitor().getIssues().stream()
                 .filter(i -> i.getComponent().getReportAttributes().getScmPath().isPresent())
                 .filter(i -> i.getComponent().getType() == Component.Type.FILE)
-                .filter(i -> OPEN_ISSUE_STATUSES.contains(i.getIssue().status()))
-                .sorted(Comparator.comparing(a -> Severity.ALL.indexOf(a.getIssue().severity())))
+                .filter(i -> OPEN_ISSUE_STATUSES.contains(i.getStatus()))
+                .sorted(Comparator.comparing(a -> Severity.ALL.indexOf(a.getSeverity())))
                 .map(componentIssue -> {
                     String path = componentIssue.getComponent().getReportAttributes().getScmPath().get();
-                    return client.createCodeInsightsAnnotation(componentIssue.getIssue().key(),
-                            Optional.ofNullable(componentIssue.getIssue().getLine()).orElse(0),
-                            analysisDetails.getIssueUrl(componentIssue.getIssue().key()),
-                            componentIssue.getIssue().getMessage(),
+                    return client.createCodeInsightsAnnotation(componentIssue.getKey(),
+                            Optional.ofNullable(componentIssue.getLine()).orElse(0),
+                            analysisDetails.getIssueUrl(componentIssue.getKey()),
+                            componentIssue.getMessage(),
                             path,
-                            toBitbucketSeverity(componentIssue.getIssue().severity()),
-                            toBitbucketType(componentIssue.getIssue().type()));
+                            toBitbucketSeverity(componentIssue.getSeverity()),
+                            toBitbucketType(componentIssue.getType()));
                 }).collect(Collectors.groupingBy(s -> chunkCounter.getAndIncrement() / DEFAULT_MAX_ANNOTATIONS, toSet()));
 
         for (Set<CodeInsightsAnnotation> annotations : annotationChunks.values()) {
